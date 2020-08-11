@@ -202,17 +202,20 @@ export const Question = (props) => {
                                                 #{tag.name}
                                             </span>
                                         ))}
-                                        <div
-                                            className={classes.rightButton}
-                                            onClick={() =>
-                                                setShowEditor({
-                                                    show: true,
-                                                    questionId: question._id,
-                                                })
-                                            }
-                                        >
-                                            Add Answer
-                                        </div>
+                                        {state.isAuthorized && (
+                                            <div
+                                                className={classes.rightButton}
+                                                onClick={() =>
+                                                    setShowEditor({
+                                                        show: true,
+                                                        questionId:
+                                                            question._id,
+                                                    })
+                                                }
+                                            >
+                                                Add Answer
+                                            </div>
+                                        )}
                                     </Grid>
                                     <Divider />
                                     <Grid item xs={12}>
