@@ -13,6 +13,8 @@ import { QuestionService } from "../Service/QuestionService";
 import { AuthContext } from "../Context/AuthContext";
 import { useHistory } from "react-router-dom";
 import { LOCAL_PATH } from "../constants";
+import { AnswerView } from "../Components/AnswerView";
+import { PostAnswer } from "../Components/PostAnswer";
 
 const useStyles = makeStyles({
     header: {
@@ -33,10 +35,6 @@ const useStyles = makeStyles({
     title: {
         fontWeight: "bold",
     },
-    email: {
-        color: "#7979f2",
-        cursor: "pointer",
-    },
     textArea: {
         whiteSpace: "pre-line",
         fontSize: "large",
@@ -46,6 +44,10 @@ const useStyles = makeStyles({
         cursor: "pointer",
     },
     edit: {
+        cursor: "pointer",
+    },
+    email: {
+        color: "#7979f2",
         cursor: "pointer",
     },
 });
@@ -71,7 +73,28 @@ const useQuestion = (id, startLoader, stopLoader) => {
     };
     const handleQuestionError = (err) => console.log(err);
 
-    return question;
+    const handleAnswerDelete = (id) => {
+        setQuestion((prev) => ({
+            ...prev,
+            answerId: prev.answerId.filter((item) => item._id !== id),
+        }));
+    };
+    const handleAnswerAdd = (answer) => {
+        setQuestion((prev) => ({
+            ...prev,
+            answerId: [answer].concat(prev.answerId),
+        }));
+    };
+    const handleAnswerEdit = (answer) => {
+        setQuestion((prev) => ({
+            ...prev,
+            answerId: prev.answerId.map((item) =>
+                item._id === answer._id ? answer : item
+            ),
+        }));
+    };
+
+    return { question, handleAnswerDelete, handleAnswerAdd, handleAnswerEdit };
 };
 
 export const Question = (props) => {
@@ -79,11 +102,18 @@ export const Question = (props) => {
     const id = props.match.params.id;
     const history = useHistory();
     const [loading, setLoading] = useState(false);
+    const [underEdit, setUnderEdit] = useState(undefined);
+    const [showEditor, setShowEditor] = useState({ show: false });
     const startLoader = () => setLoading(true);
     const stopLoader = () => setLoading(false);
     const { state } = useContext(AuthContext);
 
-    const question = useQuestion(id, startLoader, stopLoader);
+    const {
+        question,
+        handleAnswerDelete,
+        handleAnswerAdd,
+        handleAnswerEdit,
+    } = useQuestion(id, startLoader, stopLoader);
 
     const deleteQuestion = (id) => {
         QuestionService.Delete(
@@ -123,6 +153,9 @@ export const Question = (props) => {
                                                 <div className={classes.title}>
                                                     {question.title}
                                                 </div>
+                                                <span className={classes.email}>
+                                                    ({question.userId.email})
+                                                </span>
                                             </Grid>
                                             <Grid item xs={1}>
                                                 {state.isAuthorized &&
@@ -160,13 +193,24 @@ export const Question = (props) => {
                                         </pre>
                                     </Grid>
                                     <Grid item xs={12}>
-                                        {question.tagId.map((tag) => (
-                                            <span className={classes.tags}>
+                                        {question.tagId.map((tag, index) => (
+                                            <span
+                                                key={index}
+                                                className={classes.tags}
+                                            >
                                                 {" "}
                                                 #{tag.name}
                                             </span>
                                         ))}
-                                        <div className={classes.rightButton}>
+                                        <div
+                                            className={classes.rightButton}
+                                            onClick={() =>
+                                                setShowEditor({
+                                                    show: true,
+                                                    questionId: question._id,
+                                                })
+                                            }
+                                        >
                                             Add Answer
                                         </div>
                                     </Grid>
@@ -176,13 +220,49 @@ export const Question = (props) => {
                                             Answers:
                                         </div>
                                     </Grid>
-                                    {question.answerId.map((item) => (
+                                    {showEditor.show && (
                                         <Grid item xs={12}>
-                                            <pre className={classes.textArea}>
-                                                {question.answerId[0].answer}
-                                            </pre>
+                                            <PostAnswer
+                                                {...showEditor}
+                                                onComplete={() =>
+                                                    setShowEditor({
+                                                        show: false,
+                                                    })
+                                                }
+                                                getData={handleAnswerAdd}
+                                                startLoader={startLoader}
+                                                stopLoader={stopLoader}
+                                            />
                                         </Grid>
-                                    ))}
+                                    )}
+                                    {question.answerId.map((item, index) =>
+                                        underEdit !== item._id ? (
+                                            <AnswerView
+                                                key={index}
+                                                startLoader={startLoader}
+                                                stopLoader={stopLoader}
+                                                handleDelete={
+                                                    handleAnswerDelete
+                                                }
+                                                handleEdit={() =>
+                                                    setUnderEdit(item._id)
+                                                }
+                                            >
+                                                {item}
+                                            </AnswerView>
+                                        ) : (
+                                            <PostAnswer
+                                                key={index}
+                                                answer={item}
+                                                getData={handleAnswerEdit}
+                                                onComplete={() =>
+                                                    setUnderEdit(null)
+                                                }
+                                                startLoader={startLoader}
+                                                stopLoader={stopLoader}
+                                            />
+                                        )
+                                    )}
                                     {!question.answerId.length && (
                                         <Grid item xs={12}>
                                             <div className={classes.title}>

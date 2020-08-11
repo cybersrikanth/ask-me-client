@@ -5,6 +5,7 @@ import {
     CardHeader,
     CardContent,
     makeStyles,
+    Typography,
 } from "@material-ui/core";
 import { Add as AddIcon } from "@material-ui/icons";
 import { QuestionService } from "../Service/QuestionService";
@@ -13,12 +14,18 @@ import { QuestionView } from "../Components/QuestionView";
 import { useHistory } from "react-router-dom";
 import { LOCAL_PATH } from "../constants";
 import { AuthContext } from "../Context/AuthContext";
+import { Search } from "../Components/Search";
 
 const useStyles = makeStyles({
     header: {
         display: "flex",
         textAlign: "center",
         margin: "auto",
+    },
+    add: {
+        display: "flex",
+        padding: "25px",
+        justifyContent: "end",
     },
     addIcon: {
         borderRadius: "50%",
@@ -50,13 +57,16 @@ const useQuestions = (page, startLoader, stopLoader) => {
     const [isOver, setIsOver] = useState(false);
 
     useEffect(() => {
-        QuestionService.Page(
-            page,
-            startLoader,
-            handlePageSuccess,
-            handlePageFail,
-            stopLoader
-        );
+        const init = () => {
+            QuestionService.Page(
+                page,
+                startLoader,
+                handlePageSuccess,
+                handlePageFail,
+                stopLoader
+            );
+        };
+        init();
     }, [page]);
 
     const handlePageSuccess = (res) => {
@@ -89,7 +99,9 @@ export const Home = () => {
     const [loading, setLoading] = useState(false);
     const startLoader = () => setLoading(true);
     const stopLoader = () => setLoading(false);
+    const [searchResult, setSearchResult] = useState(null);
     const [page, setPage] = useState(1);
+    const [keyword, setKeyword] = useState("");
     const questions = useQuestions(page, startLoader, stopLoader);
     const { state } = useContext(AuthContext);
 
@@ -99,13 +111,25 @@ export const Home = () => {
             <Grid container spacing={2} direction="column">
                 <Grid item xs={12}>
                     <Grid container>
-                        <Grid item xs={10}>
+                        <Grid item xs={3}>
+                            <Search
+                                keyword={keyword}
+                                onChange={(e) => setKeyword(e.target.value)}
+                                onComplete={setSearchResult}
+                            />
+                        </Grid>
+                        <Grid item xs={6}>
                             <CardHeader
-                                title="Recent Questions"
+                                title={
+                                    searchResult
+                                        ? "Search Results"
+                                        : "Recent Questions"
+                                }
                                 className={classes.header}
                             />
                         </Grid>
-                        <Grid item xs={2} className={classes.header}>
+
+                        <Grid item xs={3} className={classes.add}>
                             {state.isAuthorized && (
                                 <AddIcon
                                     className={classes.addIcon}
@@ -115,27 +139,50 @@ export const Home = () => {
                         </Grid>
                     </Grid>
                 </Grid>
-                <CardContent>
-                    <Grid item xs={10} className={classes.questionContainer}>
-                        <Card className={classes.questionCard}>
-                            {questions.questions.map((item) => (
-                                <QuestionView question={item} />
-                            ))}
-                        </Card>
-                    </Grid>
-                    {questions.isOver ? (
-                        <div className={classes.endCard}>
-                            No questions to load
-                        </div>
-                    ) : (
-                        <div
-                            className={classes.loadButton}
-                            onClick={() => setPage((page) => page + 1)}
+                {!searchResult ? (
+                    <CardContent>
+                        <Grid
+                            item
+                            xs={10}
+                            className={classes.questionContainer}
                         >
-                            load more
-                        </div>
-                    )}
-                </CardContent>
+                            <Card className={classes.questionCard}>
+                                {questions.questions.map((item, index) => (
+                                    <QuestionView key={index} question={item} />
+                                ))}
+                            </Card>
+                        </Grid>
+                        {questions.isOver ? (
+                            <div className={classes.endCard}>
+                                No questions to load
+                            </div>
+                        ) : (
+                            <div
+                                className={classes.loadButton}
+                                onClick={() => setPage((page) => page + 1)}
+                            >
+                                load more
+                            </div>
+                        )}
+                    </CardContent>
+                ) : (
+                    <CardContent>
+                        <Grid
+                            item
+                            xs={10}
+                            className={classes.questionContainer}
+                        >
+                            {searchResult.map((item, index) => (
+                                <QuestionView key={index} question={item} />
+                            ))}
+                            {!searchResult.length && (
+                                <Typography>
+                                    No result for <b>{keyword}</b>
+                                </Typography>
+                            )}
+                        </Grid>
+                    </CardContent>
+                )}
             </Grid>
         </Card>
     );

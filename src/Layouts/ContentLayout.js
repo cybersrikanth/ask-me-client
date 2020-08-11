@@ -34,7 +34,7 @@ const ContentLayout = ({ children }) => {
         <Fragment>
             <Loader show={loading} />
             <Header />
-            <div>{children}</div>
+            {children}
         </Fragment>
     );
 };

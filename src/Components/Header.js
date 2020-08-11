@@ -9,13 +9,9 @@ import {
     IconButton,
     Toolbar,
     makeStyles,
-    TextField,
 } from "@material-ui/core";
 
-import {
-    PowerSettingsNew as Power,
-    Search as SearchIcon,
-} from "@material-ui/icons";
+import { PowerSettingsNew as Power } from "@material-ui/icons";
 
 import { useHistory } from "react-router-dom";
 import { LOCAL_PATH, TOKEN, REMOVE_USER } from "../constants";
@@ -23,25 +19,6 @@ import { AuthContext } from "../Context/AuthContext";
 import { UserService } from "../Service/UserService";
 
 const useStyles = makeStyles({
-    appBar: {},
-    iconButton: {},
-    search: {
-        borderRadius: "2px",
-        position: "relative",
-        width: "100%",
-    },
-    searchIconWraper: {
-        width: "50px",
-        height: "100%",
-        position: "absolute",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    input: {
-        color: "#FFF",
-        marginLeft: "40px",
-    },
     authLink: {
         cursor: "pointer",
     },
@@ -101,7 +78,7 @@ function UserMenu() {
                         open={Boolean(anchorMenu)}
                         onClose={closeMenu}
                     >
-                        <MenuItem onClick={closeMenu}>Profile</MenuItem>
+                        {/* <MenuItem onClick={closeMenu}>Profile</MenuItem> */}
                         <MenuItem onClick={triggerLogout}>Sign out</MenuItem>
                     </Menu>
                 </>
@@ -118,25 +95,13 @@ function UserMenu() {
 }
 
 const Header = () => {
-    const classes = useStyles();
+    const { state } = useContext(AuthContext);
     return (
         <React.Fragment>
             <AppBar position="sticky" elevation={0}>
                 <Toolbar>
+                    <Grid item xs={6}>{ state.isAuthorized && `Welcome, ${state.user.email}`} </Grid>
                     <Grid container alignItems="center">
-                        <Grid item>
-                            <div className={classes.search}>
-                                <div className={classes.searchIconWraper}>
-                                    <SearchIcon />
-                                </div>
-                                <TextField
-                                    InputProps={{
-                                        className: classes.input,
-                                    }}
-                                    placeholder="Search topics"
-                                />
-                            </div>
-                        </Grid>
                         <Grid item xs />
                         <Grid item>
                             <UserMenu />

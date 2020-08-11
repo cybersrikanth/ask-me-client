@@ -11,6 +11,10 @@ import { TOKEN, LOCAL_PATH } from "../constants";
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles({
+    link: {
+        color: "blue",
+        cursor: "pointer",
+    },
     container: {
         width: "30%",
         height: "60%",
@@ -22,21 +26,17 @@ const useStyles = makeStyles({
     center: {
         textAlign: "center",
     },
-    link: {
-        color: "blue",
-        cursor: "pointer",
-    },
 });
-export const Signin = () => {
+export const Signup = () => {
     const classes = useStyles();
     const history = useHistory();
     const [loading, setLoading] = useState(false);
     const startLoading = () => setLoading(true);
     const stopLoading = () => setLoading(false);
 
-    const handleLogin = (values) => {
+    const handleSignup = (values) => {
         const payload = { user: values };
-        UserService.Signin(
+        UserService.Signup(
             payload,
             startLoading,
             handleLoginSuccess,
@@ -48,7 +48,7 @@ export const Signin = () => {
     const handleLoginSuccess = (res) => {
         const token = res.data.data;
         localStorage.setItem(TOKEN, token);
-        history.push(LOCAL_PATH.HOME);
+        history.push(LOCAL_PATH.SIGNIN);
     };
     const handleLoginError = (error) => {
         console.log(error);
@@ -57,13 +57,14 @@ export const Signin = () => {
     const initialValues = {
         email: "",
         password: "",
+        confirm: "",
     };
     return (
         <Card className={classes.container}>
             <Formik
-                onSubmit={handleLogin}
+                onSubmit={handleSignup}
                 initialValues={initialValues}
-                validationSchema={UserValidator.Login}
+                validationSchema={UserValidator.Signup}
             >
                 {() => (
                     <Form>
@@ -95,6 +96,15 @@ export const Signin = () => {
                                 />
                             </Grid>
                             <Grid item>
+                                <Field
+                                    name="confirm"
+                                    type="password"
+                                    component={Input}
+                                    fullWidth
+                                    label="Confirm Password"
+                                />
+                            </Grid>
+                            <Grid item>
                                 <Button
                                     type="submit"
                                     fullWidth
@@ -102,19 +112,19 @@ export const Signin = () => {
                                     color="primary"
                                     mb={2}
                                 >
-                                    Sign in
+                                    Sign Up
                                 </Button>
                             </Grid>
                             <Grid item xs={12}>
                                 <Typography>
-                                    Dont have an account?{" "}
+                                    Already have an account?{" "}
                                     <span
                                         className={classes.link}
                                         onClick={() =>
-                                            history.push(LOCAL_PATH.SIGNUP)
+                                            history.push(LOCAL_PATH.SIGNIN)
                                         }
                                     >
-                                        create one
+                                        login
                                     </span>
                                 </Typography>
                             </Grid>

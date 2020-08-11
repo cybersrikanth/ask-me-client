@@ -8,13 +8,18 @@ export const API_PATH = {
     PROFILE: "/user/profile",
     QUESTION_PAGE: "/question/page",
     QUESTION: "/question",
+    ANSWER: "/answer",
+    SEARCH: "/question/search"
 };
 
 export const LOCAL_PATH = {
+    SIGNUP: "/signup",
     SIGNIN: "/signin",
     HOME: "/home",
     QUESTION: "/home/question",
     ASK: "/home/ask",
+    ANSWER_CREATE: "/home/answer/create",
+    ANSWER_EDIT: "/home/answer/edit",
 };
 
 // Context API

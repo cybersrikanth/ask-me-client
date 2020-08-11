@@ -1,6 +1,5 @@
 import React from "react";
 import { Grid, makeStyles, Divider } from "@material-ui/core";
-import { Edit as EditIcon } from "@material-ui/icons";
 import { timeSince } from "../Utils/TimeSince";
 import { useHistory } from "react-router-dom";
 import { LOCAL_PATH } from "../constants";
@@ -51,7 +50,7 @@ export const QuestionView = ({ question }) => {
                         <span className={classes.title}>{question.title}</span>
                         <span className={classes.email}>
                             {" "}
-                            ({question.userId.email})
+                            ({question.userId && question.userId.email})
                         </span>{" "}
                         {question.edited && (
                             <span className={classes.grey}>(edited)</span>
@@ -73,14 +72,25 @@ export const QuestionView = ({ question }) => {
                         </span>
                         {" | "}
                         <span className={classes.grey}>
-                            ({question.answers} answers)
+                            (
+                            {question.answers ||
+                                (question.answerId &&
+                                    question.answerId.length)}{" "}
+                            answers)
                         </span>
                         {" | "}
-                        {question.tagId.map((tag) => (
-                            <span className={classes.tags}> #{tag.name}</span>
-                        ))}
+                        {question.tagId &&
+                            question.tagId.map((tag, index) => (
+                                <span key={index} className={classes.tags}>
+                                    {" "}
+                                    #{tag.name}
+                                </span>
+                            ))}
                         <span className={classes.sinceNow}>
-                            {timeSince(question.date)} ago...
+                            {timeSince(
+                                question.date || new Date(question.createdAt)
+                            )}{" "}
+                            ago...
                         </span>
                     </Grid>
                     <Divider className={classes.margin} />

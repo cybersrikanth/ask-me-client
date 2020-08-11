@@ -6,7 +6,6 @@ import {
     makeStyles,
     CardContent,
     Button,
-    TextareaAutosize,
 } from "@material-ui/core";
 import Loader from "../Components/Loader";
 import { Formik, Form, Field } from "formik";
@@ -15,6 +14,8 @@ import { TextArea } from "../Components/TextArea";
 import { ChipsArray } from "../Components/ChipsArray";
 import { QuestionValidator } from "../Validators/QuestionValidator";
 import { QuestionService } from "../Service/QuestionService";
+import { useHistory } from "react-router-dom";
+import { LOCAL_PATH } from "../constants";
 
 const useStyles = makeStyles({
     header: {
@@ -30,6 +31,7 @@ const useStyles = makeStyles({
 
 export const AskQuestion = (props) => {
     const id = props.match.params.id;
+    const history = useHistory();
     const [loading, setLoading] = useState(false);
     const [initialValues, setInitialValues] = useState({
         title: "",
@@ -91,6 +93,7 @@ export const AskQuestion = (props) => {
     const handleAskSuccess = (res) => {
         const data = res.data.data;
         console.log(data);
+        history.push(LOCAL_PATH.HOME);
     };
 
     const handleAskError = (err) => {
