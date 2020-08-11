@@ -51,7 +51,7 @@ export const Signin = () => {
         history.push(LOCAL_PATH.HOME);
     };
     const handleLoginError = (error) => {
-        console.log(error);
+        alert(error.response.data.data);
     };
 
     const initialValues = {

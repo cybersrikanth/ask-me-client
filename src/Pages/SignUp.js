@@ -39,19 +39,19 @@ export const Signup = () => {
         UserService.Signup(
             payload,
             startLoading,
-            handleLoginSuccess,
-            handleLoginError,
+            handleSignupSuccess,
+            handleSignupError,
             stopLoading
         );
     };
 
-    const handleLoginSuccess = (res) => {
+    const handleSignupSuccess = (res) => {
         const token = res.data.data;
         localStorage.setItem(TOKEN, token);
         history.push(LOCAL_PATH.SIGNIN);
     };
-    const handleLoginError = (error) => {
-        console.log(error);
+    const handleSignupError = (error) => {
+        alert(error.response.data.data);
     };
 
     const initialValues = {
